@@ -29,7 +29,7 @@ Few features of this plugin:
 7. Now with Powerpay Payment Gateway Emulator Support. [PowerPay Emulator](https://verifi.powerpay.biz/merchants/resources/integration/integration_portal.php?tid=05c669210ef24ff5e635eeed8ed5d4b8#carts_authnet "Powerpay Emulator")
 
 **Contact me for any Help you need to setup or need extra feature, just leave a comment** 
-[Contact Ishan Verma](http://www.phptubelight.com/portfolio/authorize-net-payment-gateway-for-woocommerce/ "Contact for Help")
+[Contact Ishan Verma](https://twitter.com/justishan "Contact for Help/Follow for updates")
 
 == Installation ==
 
