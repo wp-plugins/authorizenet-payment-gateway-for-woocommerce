@@ -32,6 +32,8 @@ Few features of this plugin:
 **Contact me for any Help you need to setup or need extra feature, just leave a comment** 
 [Contact Ishan Verma](https://twitter.com/justishan "Contact for Help")
 
+**Contact our plugin support and quick solutions at [Plugin Support](http://www.wuxxa.com/product-support)
+
 **Follow on Twitter for plugin related updates and help** 
 [Follow Ishan Verma](https://twitter.com/justishan "Follow for updates")
 == Installation ==
