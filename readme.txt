@@ -4,8 +4,8 @@ Contributors: ishanverma
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BGLLRRL64AKZU
 Tags: woocommerce authorize.net, authorize.net, payment gateway, woocommerce, woocommerce payment gateway
 Requires at least: 3.0.1
-Tested up to: 3.9.1
-Stable tag: 1.7
+Tested up to: 4.0
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ This Payment Gateway For WooCommerce extends the functionality of WooCommerce to
 <h3>Authorize.net Payment Gateway for WooCommerce</h3> makes your website ready to use Authorize.net payment gateway to accept credit/debit cards on your ecommerce store in safe way. 
 
 Authorize.net is most widely used payment gateway to process payments online and accepts Visa, MasterCard, Discover and other variants of cards.
-<h3>WooCommerce 2.1.8 Compatible</h3>
+<h3>Latest WooCommerce Compatible</h3>
 = Features =
 Few features of this plugin:
 
@@ -26,13 +26,12 @@ Few features of this plugin:
 4. Option to configure success & failure message
 5. Safe way to process credit cards and debit cards on WooCommerce using authorize.net SIM
 6. This plugin use hosted solution provided by Authorize.net and payment is processed on secured servers of Authorize.net
-7. Now with Powerpay Payment Gateway Emulator Support. [PowerPay Emulator](https://verifi.powerpay.biz/merchants/resources/integration/integration_portal.php?tid=05c669210ef24ff5e635eeed8ed5d4b8#carts_authnet "Powerpay Emulator")
-
+7. Now with Option to use Authorize only mode.
 
 **Contact me for any Help you need to setup or need extra feature, just leave a comment** 
 [Contact Ishan Verma](https://twitter.com/justishan "Contact for Help")
 
-**Contact our plugin support and quick solutions at [Plugin Support](http://www.wuxxa.com/product-support)
+**Contact our plugin support and quick solutions at [Plugin Support](http://www.indatos.com/resources/plugin-support/)
 
 **Follow on Twitter for plugin related updates and help** 
 [Follow Ishan Verma](https://twitter.com/justishan "Follow for updates")
@@ -80,6 +79,10 @@ SSL is not required
 
 
 == Changelog ==
+= 3.0 =
+* Fixes for URL Issues.
+* Option to use Authorize only mode.
+* Bug fixes
 
 = 2.0 =
 * Compatible with woocommerce 2.1.1
