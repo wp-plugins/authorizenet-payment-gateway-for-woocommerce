@@ -2,10 +2,10 @@
 /*
    Plugin Name: Authorize.net Payment Gateway For WooCommerce
    Description: Extends WooCommerce to Process Payments with Authorize.net gateway.
-   Version: 1.2.3
-   Plugin URI: http://www.phptubelight.com?source=woocomautho
+   Version: 3.0
+   Plugin URI: http://www.indatos.com?source=woocomautho
    Author: Ishan Verma 
-   Author URI: http://www.phptubelight.com?source=woocomautho
+   Author URI: https://twitter.com/justishan
    License: Under GPL2
 
 */
@@ -41,7 +41,9 @@ function woocommerce_tech_autho_init() {
          $this->description      = $this->settings['description'];
          $this->login            = $this->settings['login_id'];
          $this->mode             = $this->settings['working_mode'];
+         $this->transaction_mode = $this->settings['transaction_mode'];
          $this->transaction_key  = $this->settings['transaction_key'];
+         $this->hash_key         = $this->settings['hash_key'];
          $this->success_message  = $this->settings['success_message'];
          $this->failed_message   = $this->settings['failed_message'];
          $this->liveurl          = 'https://secure.authorize.net/gateway/transact.dll';
@@ -54,6 +56,7 @@ function woocommerce_tech_autho_init() {
          //update for woocommerce >2.0
          add_action( 'woocommerce_api_wc_tech_autho' , array( $this, 'check_authorize_response' ) );
          add_action('valid-authorize-request', array(&$this, 'successful_request'));
+         
          
          if ( version_compare( WOOCOMMERCE_VERSION, '2.0.0', '>=' ) ) {
              add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( &$this, 'process_admin_options' ) );
@@ -86,12 +89,16 @@ function woocommerce_tech_autho_init() {
                   'default'      => __('Pay securely by Credit or Debit Card through Authorize.net Secure Servers.', 'tech')),
             'login_id'     => array(
                   'title'        => __('Login ID', 'tech'),
-                  'type'         => 'text',
+                  'type'         => 'password',
                   'description'  => __('This is API Login ID')),
             'transaction_key' => array(
                   'title'        => __('Transaction Key', 'tech'),
-                  'type'         => 'text',
+                  'type'         => 'password',
                   'description'  =>  __('API Transaction Key', 'tech')),
+            'hash_key' => array(
+                  'title'        => __('MD5 Hash Key', 'tech'),
+                  'type'         => 'password',
+                  'description'  =>  __('MD5 Hash Key is required to validate the response from Authorize.net. Refer: <a href="http://help.webscribble.com/display/webjobs/Setting+up+your+Authorize.net+MD5+hash">http://help.webscribble.com/display/webjobs/Setting+up+your+Authorize.net+MD5+hash</a> for help.', 'tech')),
             'success_message' => array(
                   'title'        => __('Transaction Success Message', 'tech'),
                   'type'         => 'textarea',
@@ -105,8 +112,13 @@ function woocommerce_tech_autho_init() {
             'working_mode'    => array(
                   'title'        => __('API Mode'),
                   'type'         => 'select',
-            'options'      => array('false'=>'Live Mode', 'true'=>'Test/Sandbox Mode', 'powerpay' => 'PowerPay Payment Gateway Emulator'),
-                  'description'  => "Live/Test Mode" )
+                  'options'      => array('false'=>'Live/Production Mode', 'false_test' => 'Live/Production API in Test Mode', 'true'=>'Sandbox/Developer API Mode'),
+                  'description'  => "Live or Production / Sandbox Mode" ),
+            'transaction_mode'    => array(
+                  'title'        => __('Transaction Mode'),
+                  'type'         => 'select',
+                  'options'      => array( 'auth_capture'=>'Authorize and Capture', 'authorize'=>'Authorize Only'),
+                  'description'  => "Transaction Mode. If you are not sure what to use set to Authorize and Capture" )
          );
       }
       
@@ -152,11 +164,10 @@ function woocommerce_tech_autho_init() {
       function process_payment($order_id)
       {
          $order = new WC_Order($order_id);
-         return array('result'   => 'success',
-                     'redirect'  => add_query_arg('order',
-                                    $order->id, 
-                                    add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
-         );
+         return array(
+         				'result' 	=> 'success',
+         				'redirect'	=> $order->get_checkout_payment_url( true )
+         			);
       }
       
       /**
@@ -166,17 +177,18 @@ function woocommerce_tech_autho_init() {
       {
         
          global $woocommerce;
-         
+         $temp_order            = new WC_Order();  
+        
+
          if ( count($_POST) ){
          
             $redirect_url = '';
             $this->msg['class']     = 'error';
             $this->msg['message']   = $this->failed_message;
-
-            if ( $_POST['x_response_code'] != '' ){
-               try{
-               
-                  $order            = new WC_Order($_POST['x_invoice_num']);
+            $order                  = new WC_Order($_POST['x_invoice_num']);
+            $hash_key               = ($this->hash_key != '') ? $this->hash_key : '';
+            if ( $_POST['x_response_code'] != '' &&  ($_POST['x_MD5_Hash'] ==  strtoupper(md5( $hash_key . $this->login . $_POST['x_trans_id'] .  $_POST['x_amount']))) ){
+               try{                  
                   $amount           = $_POST['x_amount'];
                   $hash             = $_POST['x_MD5_Hash'];
                   $transauthorised  = false;
@@ -220,18 +232,12 @@ function woocommerce_tech_autho_init() {
                }
 
             }
-            $redirect_url =  add_query_arg('order',
-                                                  $order->id, 
-                                                  add_query_arg('key', $order->order_key, 
-                                                  get_permalink(get_option('woocommerce_thanks_page_id'))));
+            $redirect_url = $order->get_checkout_order_received_url();
             $this->web_redirect( $redirect_url); exit;
          }
          else{
             
-            $redirect_url =  add_query_arg('order',
-                                                  $order->id, 
-                                                  add_query_arg('key', $order->order_key, 
-                                                  get_permalink(get_option('woocommerce_thanks_page_id'))));
+            $redirect_url = $temp_order->get_checkout_order_received_url();
             $this->web_redirect($redirect_url.'?msg=Unknown_error_occured');
             exit;
          }
@@ -256,16 +262,14 @@ function woocommerce_tech_autho_init() {
          global $woocommerce;
          
          $order      = new WC_Order($order_id);
-         $sequence   = rand(1, 1000);
          $timeStamp  = time();
 
          if( phpversion() >= '5.1.2' ) { 
-            $fingerprint = hash_hmac("md5", $this->login . "^" . $sequence . "^" . $timeStamp . "^" . $order->order_total . "^", $this->transaction_key); }
+            $fingerprint = hash_hmac("md5", $this->login . "^" . $order_id . "^" . $timeStamp . "^" . $order->order_total . "^", $this->transaction_key); }
          else { 
-            $fingerprint = bin2hex(mhash(MHASH_MD5,  $this->login . "^" . $sequence . "^" . $timeStamp . "^" . $order->order_total . "^", $this->transaction_key)); 
+            $fingerprint = bin2hex(mhash(MHASH_MD5,  $this->login . "^" . $order_id . "^" . $timeStamp . "^" . $order->order_total . "^", $this->transaction_key)); 
          }
-         $redirect_url = (get_option('woocommerce_thanks_page_id') != '' ) ? get_permalink(get_option('woocommerce_thanks_page_id')): get_site_url().'/' ;
-         $relay_url = add_query_arg( array('wc-api' => get_class( $this ) ,'order_id' => $order_id ), $redirect_url );
+          $relay_url = get_site_url().'/wc-api/'.get_class( $this );
          
          $authorize_args = array(
             'x_login'                  => $this->login,
@@ -273,10 +277,10 @@ function woocommerce_tech_autho_init() {
             'x_invoice_num'            => $order_id,
             'x_relay_response'         => "TRUE",
             'x_relay_url'              => $relay_url,
-            'x_fp_sequence'            => $sequence,
+            'x_fp_sequence'            => $order_id,
             'x_fp_hash'                => $fingerprint,
             'x_show_form'              => 'PAYMENT_FORM',
-            'x_test_request'           => $this->mode,
+            'x_version'                => '3.1',
             'x_fp_timestamp'           => $timeStamp,
             'x_first_name'             => $order->billing_first_name ,
             'x_last_name'              => $order->billing_last_name ,
@@ -299,10 +303,19 @@ function woocommerce_tech_autho_init() {
             'x_cancel_url'             => $woocommerce->cart->get_checkout_url(),
             'x_cancel_url_text'        => 'Cancel Payment'
             );
-
             
-         if($this->mode == 'powerpay'){
-            $authorize_args['x_fp_hash'] = 'gateway';
+         if( $this->transaction_mode == 'authorize' ){
+            $authorize_args['x_type'] = 'AUTH_ONLY';
+         }else{
+            $authorize_args['x_type'] = 'AUTH_CAPTURE';
+         
+         }
+         
+         if( $this->mode == 'false_test' ){
+            $authorize_args['x_test_request'] = 'TRUE';
+         }else{
+            $authorize_args['x_test_request'] = 'FALSE';
+         
          }
          
          $authorize_args_array = array();
@@ -314,11 +327,8 @@ function woocommerce_tech_autho_init() {
         if($this->mode == 'true'){
            $processURI = $this->testurl;
          }
-         else if($this->mode == 'powerpay'){
-           $processURI = $this->powerpay;
-         }
          else{
-             $processURI = $this->liveurl;
+            $processURI = $this->liveurl;
          }
          
          $html_form    = '<form action="'.$processURI.'" method="post" id="authorize_payment_form">' 
