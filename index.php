@@ -78,9 +78,9 @@ function woocommerce_tech_autho_init() {
          }
       }
       
-      function process_refund($order_id, $amount = null)
+      function process_refund($order_id, $amount = null, $reason = '')
       {
-         return indatos_woo_auth_process_refund($order_id, $amount = null);
+         return indatos_woo_auth_process_refund($order_id, $amount = null, $reason = '');
       }
           
       function init_form_fields()
