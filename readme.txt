@@ -4,8 +4,8 @@ Contributors: ishanverma
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BGLLRRL64AKZU
 Tags: woocommerce authorize.net, authorize.net, payment gateway, woocommerce, woocommerce payment gateway
 Requires at least: 3.0.1
-Tested up to: 4.0
-Stable tag: 1.8
+Tested up to: 4.1
+Stable tag: 3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,7 @@ SSL is not required
 
 
 == Changelog ==
+= 3.1 = minor updates
 = 3.0 =
 * Fixes for URL Issues.
 * Option to use Authorize only mode.

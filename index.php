@@ -2,7 +2,7 @@
 /*
    Plugin Name: Authorize.net Payment Gateway For WooCommerce
    Description: Extends WooCommerce to Process Payments with Authorize.net gateway.
-   Version: 3.0
+   Version: 3.1
    Plugin URI: http://www.indatos.com?source=woocomautho
    Author: Ishan Verma 
    Author URI: https://twitter.com/justishan
@@ -28,7 +28,7 @@ function woocommerce_tech_autho_init() {
    class WC_Tech_Autho extends WC_Payment_Gateway 
    {
       protected $msg = array();
-      
+ 
       public function __construct(){
 
          $this->id               = 'authorize';
@@ -52,6 +52,7 @@ function woocommerce_tech_autho_init() {
          $this->msg['message']   = "";
          $this->msg['class']     = "";
         
+
          add_action('init', array(&$this, 'check_authorize_response'));
          //update for woocommerce >2.0
          add_action( 'woocommerce_api_wc_tech_autho' , array( $this, 'check_authorize_response' ) );
@@ -66,8 +67,22 @@ function woocommerce_tech_autho_init() {
 
          add_action('woocommerce_receipt_authorize', array(&$this, 'receipt_page'));
          add_action('woocommerce_thankyou_authorize',array(&$this, 'thankyou_page'));
+         
+         if( function_exists('indatos_woo_auth_process_refund') ){
+            $this->supports = array(
+              'products',
+              'refunds'
+            );
+         }else{
+            
+         }
       }
-
+      
+      function process_refund($order_id, $amount = null)
+      {
+         return indatos_woo_auth_process_refund($order_id, $amount = null);
+      }
+          
       function init_form_fields()
       {
 
@@ -122,6 +137,7 @@ function woocommerce_tech_autho_init() {
          );
       }
       
+     
       /**
        * Admin Panel Options
        * - Options for bits like 'title' and availability on a country-by-country basis
@@ -204,7 +220,7 @@ function woocommerce_tech_autho_init() {
                            
                         }
                         else{
-                            $order->payment_complete();
+                            $order->payment_complete($_REQUEST['x_trans_id']);
                             $order->add_order_note('Autorize.net payment successful<br/>Ref Number/Transaction ID: '.$_REQUEST['x_trans_id']);
                             $order->add_order_note($this->msg['message']);
                             $woocommerce->cart->empty_cart();
