@@ -2,7 +2,7 @@
 /*
    Plugin Name: Authorize.net Payment Gateway For WooCommerce
    Description: Extends WooCommerce to Process Payments with Authorize.net gateway.
-   Version: 3.2
+   Version: 3.2.1
    Plugin URI: http://www.indatos.com?source=woocomautho
    Author: Ishan Verma 
    Author URI: https://twitter.com/justishan
@@ -113,7 +113,7 @@ function woocommerce_tech_autho_init() {
             'hash_key' => array(
                   'title'        => __('MD5 Hash Key', 'tech'),
                   'type'         => 'password',
-                  'description'  =>  __('MD5 Hash Key is required to validate the response from Authorize.net. Refer: <a href="http://help.webscribble.com/display/webjobs/Setting+up+your+Authorize.net+MD5+hash">http://help.webscribble.com/display/webjobs/Setting+up+your+Authorize.net+MD5+hash</a> for help.', 'tech')),
+                  'description'  =>  __('MD5 Hash Key is required to validate the response from Authorize.net. Refer: <a href="http://www.indatos.com/2015/01/31/setup-md5-hash-security-authorize-net/?ref=auth-sim" target="_blank">MD5 Security Feature</a> for help.', 'tech')),
             'success_message' => array(
                   'title'        => __('Transaction Success Message', 'tech'),
                   'type'         => 'textarea',
