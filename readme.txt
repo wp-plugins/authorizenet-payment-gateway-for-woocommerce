@@ -79,6 +79,7 @@ SSL is not required
 
 
 == Changelog ==
+= 3.2.1 = Compatible to woocommerce 2.2.11
 = 3.1 = minor updates
 = 3.0 =
 * Fixes for URL Issues.
