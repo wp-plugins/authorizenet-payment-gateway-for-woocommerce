@@ -285,7 +285,7 @@ function woocommerce_tech_autho_init() {
          else { 
             $fingerprint = bin2hex(mhash(MHASH_MD5,  $this->login . "^" . $order_id . "^" . $timeStamp . "^" . $order->order_total . "^", $this->transaction_key)); 
          }
-          $relay_url = get_site_url().'/wc-api/'.get_class( $this );
+          $relay_url = get_site_url().'/?wc-api/'.get_class( $this );
          
          $authorize_args = array(
             'x_login'                  => $this->login,
